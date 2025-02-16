@@ -8,7 +8,7 @@ import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-@Schema
+@Schema(description = "Ответ подписки")
 public record SubscriptionResponse (
         @NotNull(message = ErrorMessages.ID_CANNOT_BE_NULL)
        @Schema(description = "Id подписки")

@@ -88,7 +88,7 @@ public class FileController {
             content = @Content(schema = @Schema(implementation = Error.class))
         )
     })
-    @PostMapping
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     public UploadFileResponse upload(
         @Parameter(description = "Файл к загрузке") @RequestParam MultipartFile file

@@ -1,7 +1,10 @@
+import groovy.lang.Closure
+
 plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.4.2'
 	id 'io.spring.dependency-management' version '1.1.7'
+	id 'jacoco'
 }
 
 group = 'file'
@@ -39,14 +42,17 @@ dependencies {
 
 	implementation 'org.springframework.boot:spring-boot-starter-websocket'
 
-	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.4.0")
-	implementation("org.springdoc:springdoc-openapi-starter-common:2.4.0")
+	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.7.0")
+	implementation("org.springdoc:springdoc-openapi-starter-common:2.7.0")
 	implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
 	implementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+	testImplementation("org.springframework.boot:spring-boot-testcontainers")
+	testImplementation("org.testcontainers:junit-jupiter")
+	testImplementation("org.testcontainers:minio")
 }
 
 dependencyManagement {
@@ -57,4 +63,45 @@ dependencyManagement {
 
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+test {
+	finalizedBy jacocoTestReport
+	finalizedBy jacocoTestCoverageVerification
+}
+
+jacocoTestReport {
+	dependsOn test
+	reports {
+		html.required = true
+	}
+	classDirectories.setFrom(files(classDirectories.files.collect(({
+		fileTree(dir: it, excludes: [
+				'file/config/*',
+				'file/exception/*',
+				'file/utils/*',
+				'file/FileApplication.class'
+		])
+	} as Closure<Object>))))
+}
+
+jacocoTestCoverageVerification {
+	violationRules {
+		rule {
+			element = 'BUNDLE'
+			limit {
+				counter = 'INSTRUCTION'
+				value = 'COVEREDRATIO'
+				minimum = 0.70
+			}
+		}
+	}
+	classDirectories.setFrom(files(classDirectories.files.collect(({
+		fileTree(dir: it, excludes: [
+				'file/config/*',
+				'file/exception/*',
+				'file/utils/*',
+				'file/FileApplication.class'
+		])
+	} as Closure<Object>))))
 }

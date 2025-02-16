@@ -2,6 +2,7 @@ package messenger.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import messenger.controller.ChatController;
 import messenger.dto.chat.request.CreateChatRequest;
 import messenger.dto.chat.response.ChatForResponse;
 import messenger.dto.chat.response.MessageForResponse;
@@ -16,6 +17,7 @@ import messenger.entity.UsersChats;
 import messenger.exception.ErrorCode;
 import messenger.exception.InternalException;
 import messenger.repository.chat.ChatRepository;
+import messenger.repository.chat.UsersChatsRepository;
 import messenger.utils.SecurityContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -28,6 +30,7 @@ import org.springframework.web.context.request.async.DeferredResult;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -48,6 +51,8 @@ public class ChatService {
 
     private final MessageService messageService;
 
+    private final UsersChatsRepository usersChatsRepository;
+
     private final ConcurrentHashMap<UUID, List<MessageForResponse>> chatMessages = new ConcurrentHashMap<>();
 
     private final ConcurrentHashMap<UUID, ConcurrentLinkedQueue<DeferredResult<MessageForResponse>>> chatClients = new ConcurrentHashMap<>();
@@ -64,7 +69,7 @@ public class ChatService {
         chatForSave.setChatType(createChatRequest.getChatType());
         chatForSave.setName(createChatRequest.getName());
         Chat savedChat = chatRepository.save(chatForSave);
-        List<UUID> listUsersIds = createChatRequest.getUsers();
+        List<UUID> listUsersIds = new ArrayList<>();
         if (chatForSave.getChatType() == 0 && listUsersIds.size() > 2) {
             throw new InternalException(HttpStatus.BAD_REQUEST, ErrorCode.USER_COUNT_ERROR);
         }
@@ -72,27 +77,19 @@ public class ChatService {
         if (!listUsersIds.stream().allMatch(uniqueIds::add)) {
             throw new InternalException(HttpStatus.BAD_REQUEST, ErrorCode.USER_DUPLICATED);
         }
-        for (UUID listUsersId : listUsersIds) {
-            Optional<UsersChats> usersChatsO = usersChatsService.findByUserId(listUsersId);
-            if (usersChatsO.isEmpty()) {
-                throw new InternalException(HttpStatus.NOT_FOUND, ErrorCode.NOT_FOUND);
-            }
-            UsersChats usersChats = usersChatsO.get();
-            List<UUID> chats = usersChats.getChats();
-            UUID savedId = savedChat.getId();
-            chats.add(savedId);
-            usersChatsService.save(usersChats);
-        }
         log.info("Chat with ID: {} has been successfully created.", savedChat.getId());
         return savedChat.getId();
     }
 
     @Transactional
-    public UUID sendMessage(UUID chatId, Message message) {
+    public UUID sendMessage(UUID chatId, ChatController.SendMessage newMessage) {
+        Message message = new Message();
         message.setChatId(chatRepository.findById(chatId).orElseThrow(() -> new InternalException(HttpStatus.NOT_FOUND, ErrorCode.CHAT_NOT_FOUND)));
         message.setId(UUID.randomUUID());
         message.setAuthorId(UUID.fromString(SecurityContextHolder.getUserId()));
         message.setTimestamp(Timestamp.valueOf(LocalDateTime.now()));
+        message.setText(newMessage.getText());
+        message.setPhotos(newMessage.getPhotos());
         messageService.save(message);
         MessageForResponse messageForResponse = new MessageForResponse(message);
         List<MessageForResponse> messages = chatMessages.computeIfAbsent(chatId, k -> new ArrayList<>());
@@ -122,7 +119,10 @@ public class ChatService {
     @Transactional
     public ResponseSearchChat getUsersChats(UUID userId, String request, Long pageNumber, Long countChatsOnPage) {
         if (request == null) request = "";
-        List<UUID> userChats = usersChatsService.findByUserId(userId).orElseThrow(() -> new InternalException(HttpStatus.NOT_FOUND, ErrorCode.NOT_FOUND)).getChats();
+        List<UUID> userChats = usersChatsService.findByUserId(userId).stream()
+            .map(UsersChats::getChats)
+            .flatMap(List::stream)
+            .toList();
         List<Chat> listOfChats = chatRepository.findByNameContainingAndIdIn(userChats, request, PageRequest.of(pageNumber.intValue(), countChatsOnPage.intValue()))
             .stream()
             .toList();
@@ -170,7 +170,10 @@ public class ChatService {
 
     @Transactional
     public ResponseGettingChats getAllChatsByUserId(UUID userId, Long pageNumber, Long countChatsOnPage) {
-        List<UUID> usersChats = usersChatsService.findByUserId(userId).orElseThrow(() -> new InternalException(HttpStatus.NOT_FOUND, ErrorCode.NOT_FOUND)).getChats();
+        List<UUID> usersChats = usersChatsService.findByUserId(userId).stream()
+            .map(UsersChats::getChats)
+            .flatMap(List::stream)
+            .toList();
         int startIndex = (int) (pageNumber * countChatsOnPage);
         int toIndex = (int) (startIndex + countChatsOnPage);
         if (usersChats.size() < toIndex) {
@@ -209,7 +212,11 @@ public class ChatService {
         );
     }
 
-    public UsersChats addUserChats(UsersChats usersChats) {
-        return usersChatsService.save(usersChats);
+    public UsersChats addUserChats(ChatController.UsersChatsRequest usersChats) {
+        Optional<UsersChats> pair = usersChatsRepository.findByUserIdAndChatId(usersChats.getUserId(), usersChats.getChatId());
+        if (pair.isPresent()) {
+            throw new InternalException(HttpStatus.BAD_REQUEST, ErrorCode.USER_ALREADY_IN_CHAT);
+        }
+        return usersChatsService.save(new UsersChats(UUID.randomUUID(), usersChats.getUserId(), List.of(usersChats.getChatId())));
     }
 }

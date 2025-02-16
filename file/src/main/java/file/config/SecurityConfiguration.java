@@ -32,7 +32,7 @@ public class SecurityConfiguration {
                     "/swagger-ui/**",
                     "chat-file-cloud/v3/api-docs/**"
                 ).permitAll()
-                .anyRequest().permitAll()
+                .anyRequest().authenticated()
             )
             .addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class)
             .build();

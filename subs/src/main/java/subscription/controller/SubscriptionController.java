@@ -29,7 +29,8 @@ public class SubscriptionController {
     @ApiResponses(value = {
         @ApiResponse(
             responseCode = "201",
-            description = "Подписано"
+            description = "Подписано",
+            content = @Content(schema = @Schema(implementation = CreateSubRequest.class))
         ),
         @ApiResponse(
             responseCode = "400",
@@ -124,7 +125,7 @@ public class SubscriptionController {
         @ApiResponse(
             responseCode = "200",
             description = "Найдено",
-            content = @Content(schema = @Schema(implementation = Error.class))
+            content = @Content(schema = @Schema(implementation = SubscriptionResponse.class))
         ),
         @ApiResponse(
             responseCode = "400",

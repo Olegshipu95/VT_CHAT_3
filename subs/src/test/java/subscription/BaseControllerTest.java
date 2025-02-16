@@ -1,5 +1,6 @@
 package subscription;
 
+import org.springframework.test.context.ActiveProfiles;
 import subscription.config.PostgresTestContainer;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,6 +17,7 @@ import static subscription.utils.SecurityMock.mockSecurityContext;
     classes = PostgresTestContainer.class,
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
 )
+@ActiveProfiles("test")
 public class BaseControllerTest {
 
     protected MockMvc mockMvc;

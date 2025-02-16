@@ -9,7 +9,7 @@ import java.util.List;
 
 @Data
 @AllArgsConstructor
-@Schema
+@Schema(description = "Создание поста")
 public class CreatePostRequest {
 
     @Schema(description = "Заголовок")

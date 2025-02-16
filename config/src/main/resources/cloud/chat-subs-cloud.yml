@@ -1,20 +1,20 @@
 spring:
   datasource:
-    url: ${SUBS_DB_URL:jdbc:postgresql://localhost:5435/subs}
-    #url: ${SUBS_DB_URL:jdbc:postgresql://chat-postgres:5432/subs}
+    #url: ${SUBS_DB_URL:jdbc:postgresql://localhost:5435/subs}
+    url: ${SUBS_DB_URL:jdbc:postgresql://chat-postgres:5432/subs}
     username: ${POSTGRES_USER:username}
     password: ${POSTGRES_PASSWORD:password}
 
   liquibase:
     enabled: true
-    url: ${SUBS_DB_URL:jdbc:postgresql://localhost:5435/subs}
-    #url: ${SUBS_DB_URL:jdbc:postgresql://chat-postgres:5432/subs}
+    #url: ${SUBS_DB_URL:jdbc:postgresql://localhost:5435/subs}
+    url: ${SUBS_DB_URL:jdbc:postgresql://chat-postgres:5432/subs}
     user: ${POSTGRES_USER:username}
     password: ${POSTGRES_PASSWORD:password}
 
   kafka:
-    #bootstrap-servers: chat-kafka-broker-1:9092, chat-kafka-broker-2:9093, chat-kafka-broker-3:9094
-    bootstrap-servers: localhost:29092, localhost:29093, localhost:29094
+    bootstrap-servers: chat-kafka-broker-1:9092, chat-kafka-broker-2:9093, chat-kafka-broker-3:9094
+    #bootstrap-servers: localhost:29092, localhost:29093, localhost:29094
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer

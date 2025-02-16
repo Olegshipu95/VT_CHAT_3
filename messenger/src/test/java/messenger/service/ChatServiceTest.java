@@ -1,5 +1,6 @@
 package messenger.service;
 
+import messenger.controller.ChatController;
 import messenger.dto.chat.request.CreateChatRequest;
 import messenger.dto.chat.response.ResponseGettingChats;
 import messenger.dto.chat.response.ResponseGettingMessages;
@@ -10,6 +11,7 @@ import messenger.entity.Message;
 import messenger.entity.UsersChats;
 import messenger.exception.InternalException;
 import messenger.repository.chat.ChatRepository;
+import messenger.repository.chat.UsersChatsRepository;
 import messenger.utils.SecurityMock;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -50,6 +52,9 @@ public class ChatServiceTest {
     @Mock
     private MessageService messageService;
 
+    @Mock
+    private UsersChatsRepository usersChatsRepository;
+
     @InjectMocks
     private ChatService chatService;
 
@@ -79,27 +84,15 @@ public class ChatServiceTest {
     @Test
     public void createChat_ok() {
         Chat chat = new Chat(UUID.randomUUID(), "name", 0);
-        CreateChatRequest createChatRequest = new CreateChatRequest(0, "name", List.of(UUID.randomUUID(), UUID.randomUUID()));
+        CreateChatRequest createChatRequest = new CreateChatRequest(0, "name");
         when(chatRepository.save(any())).thenReturn(chat);
         UsersChats usersChats = new UsersChats(UUID.randomUUID(), UUID.randomUUID(), new ArrayList<>());
-        when(usersChatsService.findByUserId(any())).thenReturn(Optional.of(usersChats));
 
         UUID id = chatService.createChat(createChatRequest);
 
         assertNotNull(id);
         verify(chatRepository, times(1)).save(any());
-        verify(usersChatsService, times(2)).findByUserId(any());
-    }
-
-    @Test
-    public void createChat_BAD_REQUEST() {
-        Chat chat = new Chat(UUID.randomUUID(), "name", 1);
-        CreateChatRequest createChatRequest = new CreateChatRequest(0, "name", List.of(UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID()));
-        when(chatRepository.save(any())).thenReturn(chat);
-
-        assertThrows(InternalException.class, () -> chatService.createChat(createChatRequest));
-
-        verify(chatRepository, times(1)).save(any());
+        verify(usersChatsService, times(0)).findByUserId(any());
     }
 
     @Test
@@ -108,7 +101,7 @@ public class ChatServiceTest {
         Message message = new Message(UUID.randomUUID(), chat, UUID.randomUUID(), "text", Timestamp.valueOf(LocalDateTime.now()), List.of());
 
         when(chatRepository.findById(any())).thenReturn(Optional.of(chat));
-        UUID id = chatService.sendMessage(UUID.randomUUID(), message);
+        UUID id = chatService.sendMessage(UUID.randomUUID(), new ChatController.SendMessage("text", List.of("we")));
 
         assertNotNull(id);
         verify(messageService, times(1)).save(any());
@@ -125,7 +118,7 @@ public class ChatServiceTest {
         Chat chat = new Chat(UUID.randomUUID(), "name", 0);
         Message message = new Message(UUID.randomUUID(), chat, UUID.randomUUID(), "text", Timestamp.valueOf(LocalDateTime.now()), List.of());
         UsersChats usersChats = new UsersChats(UUID.randomUUID(), UUID.randomUUID(), new ArrayList<>());
-        when(usersChatsService.findByUserId(any())).thenReturn(Optional.of(usersChats));
+        when(usersChatsService.findByUserId(any())).thenReturn(List.of(usersChats));
         when(chatRepository.findByNameContainingAndIdIn(any(),any(), any())).thenReturn(new PageImpl<>(List.of(chat)));
         when(messageService.findLastByChatId(any())).thenReturn(Optional.of(message));
         when(chatRepository.findById(any())).thenReturn(Optional.of(chat));
@@ -163,7 +156,7 @@ public class ChatServiceTest {
         Chat chat = new Chat(UUID.randomUUID(), "name", 0);
         Message message = new Message(UUID.randomUUID(), chat, UUID.randomUUID(), "text", Timestamp.valueOf(LocalDateTime.now()), List.of());
 
-        when(usersChatsService.findByUserId(any())).thenReturn(Optional.of(new UsersChats(UUID.randomUUID(), UUID.randomUUID(), List.of(UUID.randomUUID(), UUID.randomUUID()))));
+        when(usersChatsService.findByUserId(any())).thenReturn(List.of(new UsersChats(UUID.randomUUID(), UUID.randomUUID(), List.of(UUID.randomUUID(), UUID.randomUUID()))));
         when(messageService.findLastByChatId(any())).thenReturn(Optional.of(message));
         when(chatRepository.findById(any())).thenReturn(Optional.of(chat));
         when(usersChatsService.findIdsByChatId(any())).thenReturn(List.of(UUID.randomUUID(), UUID.randomUUID()));
@@ -190,12 +183,22 @@ public class ChatServiceTest {
     @Test
     public void addUserChats_ok() {
         UsersChats usersChats = new UsersChats(UUID.randomUUID(), UUID.randomUUID(), new ArrayList<>());
+        when(usersChatsRepository.findByUserIdAndChatId(any(), any())).thenReturn(Optional.empty());
         when(usersChatsService.save(any())).thenReturn(usersChats);
 
-        UsersChats expected = chatService.addUserChats(usersChats);
+        UsersChats expected = chatService.addUserChats(new ChatController.UsersChatsRequest(UUID.randomUUID(), UUID.randomUUID()));
 
         assertNotNull(expected);
         assertEquals(usersChats, expected);
         verify(usersChatsService, times(1)).save(any());
+    }
+
+    @Test
+    public void addUserChats_BAD() {
+        UsersChats usersChats = new UsersChats(UUID.randomUUID(), UUID.randomUUID(), new ArrayList<>());
+        when(usersChatsRepository.findByUserIdAndChatId(any(), any())).thenReturn(Optional.of(usersChats));
+
+        assertThrows(InternalException.class, () -> chatService.addUserChats(new ChatController.UsersChatsRequest(UUID.randomUUID(), UUID.randomUUID())));
+
     }
 }

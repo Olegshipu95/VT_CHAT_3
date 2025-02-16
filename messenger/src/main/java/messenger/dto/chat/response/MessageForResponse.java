@@ -15,7 +15,7 @@ import java.util.UUID;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Schema
+@Schema(description = "Сообщение")
 public class MessageForResponse {
     @Schema(description = "ID смс")
     private UUID id;

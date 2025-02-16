@@ -92,7 +92,7 @@ public class RouteConfiguration {
                     f.stripPrefix(1)
                         .filter(authFilter.apply(new AuthenticationFilter.Config()))
                         .circuitBreaker(cb -> cb
-                            .setName(props.getMessenger() + "-circuit-breaker")
+                            .setName(props.getFile() + "-circuit-breaker")
                             .setFallbackUri(URI.create("forward:/fallback"))
                         )
                 )
