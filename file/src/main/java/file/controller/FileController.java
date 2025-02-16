@@ -1,8 +1,13 @@
 package file.controller;
 
 import file.service.FileService;
+import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -31,6 +36,28 @@ public class FileController {
 
     private final FileService fileService;
 
+    @Operation(summary = "Cкачивание файла")
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Файл скачан"
+        ),
+        @ApiResponse(
+            responseCode = "400",
+            description = "Неверный запрос",
+            content = @Content(schema = @Schema(implementation = Error.class))
+        ),
+        @ApiResponse(
+            responseCode = "403",
+            description = "Недоступно",
+            content = @Content(schema = @Schema(implementation = Error.class))
+        ),
+        @ApiResponse(
+            responseCode = "500",
+            description = "Сервис не доступен",
+            content = @Content(schema = @Schema(implementation = Error.class))
+        )
+    })
     @GetMapping(produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public ResponseEntity<byte[]> download(
         @Parameter(description = "Путь до файла") @RequestParam String path
@@ -39,6 +66,28 @@ public class FileController {
         return asFileResponseEntity(fileService.downloadFile(path), fileName);
     }
 
+    @Operation(summary = "Загрузка файла")
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "201",
+            description = "Файл загружен"
+        ),
+        @ApiResponse(
+            responseCode = "400",
+            description = "Неверный запрос",
+            content = @Content(schema = @Schema(implementation = Error.class))
+        ),
+        @ApiResponse(
+            responseCode = "403",
+            description = "Недоступно",
+            content = @Content(schema = @Schema(implementation = Error.class))
+        ),
+        @ApiResponse(
+            responseCode = "500",
+            description = "Сервис не доступен",
+            content = @Content(schema = @Schema(implementation = Error.class))
+        )
+    })
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public UploadFileResponse upload(
@@ -48,6 +97,28 @@ public class FileController {
         return new UploadFileResponse(path);
     }
 
+    @Operation(summary = "Удаление файла")
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "204",
+            description = "Файл удален"
+        ),
+        @ApiResponse(
+            responseCode = "400",
+            description = "Неверный запрос",
+            content = @Content(schema = @Schema(implementation = Error.class))
+        ),
+        @ApiResponse(
+            responseCode = "403",
+            description = "Недоступно",
+            content = @Content(schema = @Schema(implementation = Error.class))
+        ),
+        @ApiResponse(
+            responseCode = "500",
+            description = "Сервис не доступен",
+            content = @Content(schema = @Schema(implementation = Error.class))
+        )
+    })
     @DeleteMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(
@@ -56,6 +127,28 @@ public class FileController {
         fileService.delete(path);
     }
 
+    @Operation(summary = "Поиск всех файлов пользователя")
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Файл получены"
+        ),
+        @ApiResponse(
+            responseCode = "400",
+            description = "Неверный запрос",
+            content = @Content(schema = @Schema(implementation = Error.class))
+        ),
+        @ApiResponse(
+            responseCode = "403",
+            description = "Недоступно",
+            content = @Content(schema = @Schema(implementation = Error.class))
+        ),
+        @ApiResponse(
+            responseCode = "500",
+            description = "Сервис не доступен",
+            content = @Content(schema = @Schema(implementation = Error.class))
+        )
+    })
     @GetMapping("/previews")
     @ResponseStatus(HttpStatus.OK)
     public List<String> findPreviews(
@@ -64,6 +157,29 @@ public class FileController {
         return fileService.findPreviews(userId);
     }
 
+    @Hidden
+    @Operation(summary = "Получение Url файла")
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "201",
+            description = "Файл загружен"
+        ),
+        @ApiResponse(
+            responseCode = "400",
+            description = "Неверный запрос",
+            content = @Content(schema = @Schema(implementation = Error.class))
+        ),
+        @ApiResponse(
+            responseCode = "403",
+            description = "Недоступно",
+            content = @Content(schema = @Schema(implementation = Error.class))
+        ),
+        @ApiResponse(
+            responseCode = "500",
+            description = "Сервис не доступен",
+            content = @Content(schema = @Schema(implementation = Error.class))
+        )
+    })
     @GetMapping("/urls")
     @ResponseStatus(HttpStatus.OK)
     public FindFileUrlResponse getUrl(
@@ -88,6 +204,7 @@ public class FileController {
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
+    @Schema
     public static class FindFileUrlResponse {
         @Schema(description = "Ссылка файла")
         private String url;

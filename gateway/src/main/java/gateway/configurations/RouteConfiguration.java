@@ -32,7 +32,10 @@ public class RouteConfiguration {
                 .uri("lb://" + props.getUser())
             )
             .route(props.getUser() + "-route-users", r -> r
-                .path(apiPrefix + "/accounts/users/**")
+                .path(
+                    apiPrefix + "/accounts/users/**",
+                    apiPrefix + "/" + props.getUser() + "/**"
+                )
                 .filters(f ->
                     f.stripPrefix(1)
                         .filter(authFilter.apply(new AuthenticationFilter.Config()))
@@ -44,7 +47,8 @@ public class RouteConfiguration {
                 .uri("lb://" + props.getUser())
             )
             .route(props.getFeed() + "-route-feed", r -> r
-                .path(apiPrefix + "/feed/**")
+                .path(apiPrefix + "/feed/**",
+                    apiPrefix + "/" + props.getFeed() + "/**")
                 .filters(f ->
                     f.stripPrefix(1)
                         .filter(authFilter.apply(new AuthenticationFilter.Config()))
@@ -56,7 +60,8 @@ public class RouteConfiguration {
                 .uri("lb://" + props.getFeed())
             )
             .route(props.getSubs() + "-route-sub", r -> r
-                .path(apiPrefix + "/subscribe/**")
+                .path(apiPrefix + "/subscribe/**",
+                    apiPrefix + "/" + props.getSubs() + "/**")
                 .filters(f ->
                     f.stripPrefix(1)
                         .filter(authFilter.apply(new AuthenticationFilter.Config()))
@@ -68,7 +73,8 @@ public class RouteConfiguration {
                 .uri("lb://" + props.getSubs())
             )
             .route(props.getMessenger() + "-route-messenger", r -> r
-                .path(apiPrefix + "/chats/**")
+                .path(apiPrefix + "/chats/**",
+                    apiPrefix + "/" + props.getMessenger() + "/**")
                 .filters(f ->
                     f.stripPrefix(1)
                         .filter(authFilter.apply(new AuthenticationFilter.Config()))
@@ -80,10 +86,11 @@ public class RouteConfiguration {
                 .uri("lb://" + props.getMessenger())
             )
             .route(props.getFile() + "route-file", r -> r
-                .path(apiPrefix + "/files/**")
+                .path(apiPrefix + "/files/**",
+                    apiPrefix + "/" + props.getFile() + "/**")
                 .filters(f ->
-                        f.stripPrefix(1)
-                            .filter(authFilter.apply(new AuthenticationFilter.Config()))
+                    f.stripPrefix(1)
+                        .filter(authFilter.apply(new AuthenticationFilter.Config()))
                         .circuitBreaker(cb -> cb
                             .setName(props.getMessenger() + "-circuit-breaker")
                             .setFallbackUri(URI.create("forward:/fallback"))

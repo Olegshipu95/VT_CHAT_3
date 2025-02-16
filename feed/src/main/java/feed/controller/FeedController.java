@@ -3,7 +3,12 @@ package feed.controller;
 import feed.dto.request.CreatePostRequest;
 import feed.entity.Post;
 import feed.service.FeedService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.converters.models.PageableAsQueryParam;
@@ -30,6 +35,29 @@ public class FeedController {
 
     private final FeedService feedService;
 
+    @Operation(summary = "Поиск постов")
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Посты найдены",
+            content = @Content(schema = @Schema(implementation = Post.class))
+        ),
+        @ApiResponse(
+            responseCode = "400",
+            description = "Неверный запрос",
+            content = @Content(schema = @Schema(implementation = Error.class))
+        ),
+        @ApiResponse(
+            responseCode = "403",
+            description = "Недоступно",
+            content = @Content(schema = @Schema(implementation = Error.class))
+        ),
+        @ApiResponse(
+            responseCode = "500",
+            description = "Сервис не доступен",
+            content = @Content(schema = @Schema(implementation = Error.class))
+        )
+    })
     @PageableAsQueryParam
     @GetMapping("/{userId}")
     @ResponseStatus(HttpStatus.OK)
@@ -40,12 +68,60 @@ public class FeedController {
         return feedService.getFeedByUserId(userId, pageable);
     }
 
+    @Operation(summary = "Cоздание поста")
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "201",
+            description = "Пост создан",
+            content = @Content(schema = @Schema(implementation = Post.class))
+        ),
+        @ApiResponse(
+            responseCode = "400",
+            description = "Неверный запрос",
+            content = @Content(schema = @Schema(implementation = Error.class))
+        ),
+        @ApiResponse(
+            responseCode = "403",
+            description = "Недоступно",
+            content = @Content(schema = @Schema(implementation = Error.class))
+        ),
+        @ApiResponse(
+            responseCode = "500",
+            description = "Сервис не доступен",
+            content = @Content(schema = @Schema(implementation = Error.class))
+        )
+    })
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Mono<UUID> createPost(@Valid @RequestBody CreatePostRequest createPostRequest) {
+    public Mono<UUID> createPost(
+        @Valid @RequestBody CreatePostRequest createPostRequest
+    ) {
         return feedService.createFeed(createPostRequest);
     }
 
+    @Operation(summary = "Удаление поста")
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "204",
+            description = "Пост удален",
+            content = @Content(schema = @Schema(implementation = Post.class))
+        ),
+        @ApiResponse(
+            responseCode = "400",
+            description = "Неверный запрос",
+            content = @Content(schema = @Schema(implementation = Error.class))
+        ),
+        @ApiResponse(
+            responseCode = "403",
+            description = "Недоступно",
+            content = @Content(schema = @Schema(implementation = Error.class))
+        ),
+        @ApiResponse(
+            responseCode = "500",
+            description = "Сервис не доступен",
+            content = @Content(schema = @Schema(implementation = Error.class))
+        )
+    })
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public Mono<Void> deletePost(@PathVariable UUID id) {

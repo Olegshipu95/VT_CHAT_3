@@ -11,5 +11,10 @@ spring:
   profiles:
     active: ${SPRING_PROFILES_ACTIVE:local}
 
+springdoc:
+  api-docs:
+    enabled: true
+    path: /chat-subs-cloud/v3/api-docs
+
 server:
   port: ${PORT:8084}

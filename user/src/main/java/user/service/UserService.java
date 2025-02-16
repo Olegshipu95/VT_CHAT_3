@@ -48,18 +48,6 @@ public class UserService {
             })
             .switchIfEmpty(userRepository.save(newUser))
             .map(User::getId)
-            /*.flatMap(id ->
-                UsersChats usersChats = new UsersChats();
-                usersChats.setId(UUID.randomUUID());
-                usersChats.setUserId(id);
-                usersChats.setChats(new ArrayList<>());
-                return Mono.just(usersChatsService.save(usersChats))
-                    .onErrorResume(ex -> {
-                        log.warn("Ошибка при вызове feign-клиента: {}", ex.getMessage());
-                        return Mono.empty(); // Игнорируем ошибку и продолжаем выполнение
-                    })
-                    .thenReturn(id);
-            )*/
             .doOnSuccess(id -> log.info("User with ID: {} has been successfully created.", id));
     }
 
