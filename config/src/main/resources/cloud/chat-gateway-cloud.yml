@@ -18,15 +18,15 @@ springdoc:
     urls:
       - url: /v3/api-docs
         name: chat-gateway
-      - url: /api/v3/chat-user-cloud/v3/api-docs
+      - url: /api/chat-user-cloud/v3/api-docs
         name: chat-user-cloud
-      - url: /api/v3/chat-feed-cloud/v3/api-docs
+      - url: /api/chat-feed-cloud/v3/api-docs
         name: chat-feed-cloud
-      - url: /api/v3/chat-subs-cloud/v3/api-docs
+      - url: /api/chat-subs-cloud/v3/api-docs
         name: chat-subs-cloud
-      - url: /api/v3/chat-messenger-cloud/v3/api-docs
+      - url: /api/chat-messenger-cloud/v3/api-docs
         name: chat-messenger-cloud
-      - url: /api/v3/chat-file-cloud/v3/api-docs
+      - url: /api/chat-file-cloud/v3/api-docs
         name: chat-file-cloud
 
 resilience4j:

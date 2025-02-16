@@ -1,4 +1,4 @@
-package file.config;
+package subscription.config;
 
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
@@ -26,6 +26,6 @@ public class SwaggerConfiguration {
                         .scheme("bearer")
                 )
             )
-            .info(new Info().title("Chat File API").version("1.0"));
+            .info(new Info().title("Chat Subs API").version("1.0"));
     }
 }

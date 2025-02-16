@@ -1,6 +1,11 @@
 package user.controller;
 
 import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -33,12 +38,78 @@ public class AuthController {
         return authService.getAuthorizationDetails();
     }
 
+    @Operation(summary = "Создание токенов")
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "201",
+            description = "Создано",
+            content = @Content(schema = @Schema(implementation = AuthorizeUserResponse.class))
+        ),
+        @ApiResponse(
+            responseCode = "400",
+            description = "Неверный запрос",
+            content = @Content(schema = @Schema(implementation = Error.class))
+        ),
+        @ApiResponse(
+            responseCode = "401",
+            description = "Не авторизован",
+            content = @Content(schema = @Schema(implementation = Error.class))
+        ),
+        @ApiResponse(
+            responseCode = "403",
+            description = "Недоступно",
+            content = @Content(schema = @Schema(implementation = Error.class))
+        ),
+        @ApiResponse(
+            responseCode = "404",
+            description = "Не найден",
+            content = @Content(schema = @Schema(implementation = Error.class))
+        ),
+        @ApiResponse(
+            responseCode = "500",
+            description = "Сервис не доступен",
+            content = @Content(schema = @Schema(implementation = Error.class))
+        )
+    })
     @PostMapping("/tokens")
     @ResponseStatus(HttpStatus.CREATED)
     public Mono<AuthorizeUserResponse> authorize(@Valid @RequestBody Mono<AuthorizeUserRequest> request) {
         return request.flatMap(req -> authService.authorize(req.username(), req.password()));
     }
 
+    @Operation(summary = "Обновление токенов")
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "201",
+            description = "Создано",
+            content = @Content(schema = @Schema(implementation = AuthorizeUserResponse.class))
+        ),
+        @ApiResponse(
+            responseCode = "400",
+            description = "Неверный запрос",
+            content = @Content(schema = @Schema(implementation = Error.class))
+        ),
+        @ApiResponse(
+            responseCode = "401",
+            description = "Не авторизован",
+            content = @Content(schema = @Schema(implementation = Error.class))
+        ),
+        @ApiResponse(
+            responseCode = "403",
+            description = "Недоступно",
+            content = @Content(schema = @Schema(implementation = Error.class))
+        ),
+        @ApiResponse(
+            responseCode = "404",
+            description = "Не найден",
+            content = @Content(schema = @Schema(implementation = Error.class))
+        ),
+        @ApiResponse(
+            responseCode = "500",
+            description = "Сервис не доступен",
+            content = @Content(schema = @Schema(implementation = Error.class))
+        )
+    })
     @PostMapping("/tokens/refresh")
     @ResponseStatus(HttpStatus.CREATED)
     public Mono<AuthorizeUserResponse> reAuthorize(@RequestParam String refresh) {
