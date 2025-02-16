@@ -9,7 +9,7 @@ public enum ErrorCode {
     TOKEN_EXPIRED,
     TOKEN_DOES_NOT_EXIST,
     TOKEN_INCORRECT_FORMAT,
-
+    RESOURCES_NOT_FOUND,
     // user errors
     FORBIDDEN,
     UNAUTHORIZED,

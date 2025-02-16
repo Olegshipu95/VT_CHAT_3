@@ -1,0 +1,10 @@
+spring:
+  kafka:
+    topics:
+      notification-email-topic: chat-notification-email-topic
+  cloud:
+    config:
+      enabled: false
+eureka:
+  client:
+    enabled: false

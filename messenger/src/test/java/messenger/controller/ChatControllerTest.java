@@ -15,22 +15,21 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 public class ChatControllerTest extends BaseControllerTest {
 
-
     @Test
-    public void createUsersChats() throws Exception {
+    public void createUsersChats_CREATED() throws Exception {
         mockMvc.perform(
             post("/chats/users")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(toJson(new UsersChats(UUID.randomUUID(), UUID.fromString("7f15eb05-2560-4af0-a25f-9139667fde93"), List.of())))
+                .content(toJson(new ChatController.UsersChatsRequest(UUID.randomUUID(), UUID.fromString("7f15eb05-2560-4af0-a25f-9139667fde93"))))
         ).andExpect(status().isCreated());
     }
 
     @Test
-    public void createChat_not_found() throws Exception {
+    public void createChat_CREATED() throws Exception {
         mockMvc.perform(
             post("/chats")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(toJson(new CreateChatRequest(0, "name", List.of(UUID.fromString("7f15eb05-2560-4af0-a25f-9139667fde93"), UUID.randomUUID()))))
-        ).andExpect(status().isNotFound());
+                .content(toJson(new CreateChatRequest(0, "name")))
+        ).andExpect(status().isCreated());
     }
 }

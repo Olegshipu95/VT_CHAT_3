@@ -72,8 +72,7 @@ public class FeedController {
     @ApiResponses(value = {
         @ApiResponse(
             responseCode = "201",
-            description = "Пост создан",
-            content = @Content(schema = @Schema(implementation = Post.class))
+            description = "Пост создан"
         ),
         @ApiResponse(
             responseCode = "400",
@@ -103,8 +102,7 @@ public class FeedController {
     @ApiResponses(value = {
         @ApiResponse(
             responseCode = "204",
-            description = "Пост удален",
-            content = @Content(schema = @Schema(implementation = Post.class))
+            description = "Пост удален"
         ),
         @ApiResponse(
             responseCode = "400",

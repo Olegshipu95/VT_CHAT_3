@@ -3,6 +3,10 @@ spring:
     name: chat-notification-cloud
   profiles:
     active: ${SPRING_PROFILES_ACTIVE:local}
+  kafka:
+    consumer:
+      properties:
+        allow.auto.create.topics: false
 
 server:
   port: ${PORT:8585}

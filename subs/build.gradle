@@ -80,6 +80,7 @@ jacocoTestReport {
         fileTree(dir: it, excludes: [
                 'subscription/config/*',
                 'subscription/exception/*',
+                'subscription/kafka/*',
                 'subscription/utils/*',
                 'subscription/SubscriptionApplication.class'
         ])
@@ -106,6 +107,7 @@ jacocoTestCoverageVerification {
         fileTree(dir: it, excludes: [
                 'subscription/config/*',
                 'subscription/exception/*',
+                'subscription/kafka/*',
                 'subscription/utils/*',
                 'subscription/SubscriptionApplication.class'
         ])

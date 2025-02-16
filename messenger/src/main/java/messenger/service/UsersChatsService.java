@@ -19,7 +19,7 @@ public class UsersChatsService {
         this.usersChatsRepository = usersChatsRepository;
     }
 
-    public Optional<UsersChats> findByUserId(UUID uuid) {
+    public List<UsersChats> findByUserId(UUID uuid) {
         return usersChatsRepository.findByUserId(uuid);
     }
 

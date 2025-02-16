@@ -94,7 +94,7 @@ services:
 
   chat-eureka:
     container_name: eureka-3
-    image: eureka
+    image: eureka-3
     ports:
       - "8761:8761"
     build:
@@ -107,7 +107,7 @@ services:
 
   chat-config:
     container_name: config-3
-    image: config
+    image: config-3
     ports:
       - "8888:8888"
     build:
@@ -129,7 +129,8 @@ services:
 
   gateway:
     container_name: gateway-3
-    image: gateway
+    restart: always
+    image: gateway-3
     ports:
       - "8080:8080"
     build:
@@ -149,7 +150,7 @@ services:
   user:
     container_name: user-3
     restart: always
-    image: user
+    image: user-3
     ports:
       - "8383:8383"
     build:
@@ -169,7 +170,7 @@ services:
   feed:
     container_name: feed-3
     restart: always
-    image: feed
+    image: feed-3
     ports:
       - "8381:8381"
     build:
@@ -188,7 +189,7 @@ services:
 
   subscription:
     container_name: subscription-3
-    image: subscription
+    image: subscription-3
     restart: always
     ports:
       - "8084:8084"
@@ -208,7 +209,7 @@ services:
 
   chat-messenger:
     container_name: messenger-3
-    image: messenger
+    image: messenger-3
     restart: always
     ports:
       - "8382:8382"
@@ -225,3 +226,42 @@ services:
       - gateway
     profiles:
       - cloud
+  chat-file:
+    container_name: file-3
+    image: file-3
+    restart: always
+    ports:
+      - "8282:8282"
+    build:
+      context: file
+      dockerfile: Dockerfile
+    environment:
+      SPRING_PROFILES_ACTIVE: cloud
+      EUREKA_SERVER_URL: http://chat-eureka:8761/eureka/
+      PORT: 8282
+    depends_on:
+      - chat-postgres
+      - chat-config
+      - gateway
+    profiles:
+      - cloud
+  chat-notification:
+    container_name: notification-3
+    image: notification-3
+    restart: always
+    ports:
+      - "8585:8585"
+    build:
+      context: notification
+      dockerfile: Dockerfile
+    environment:
+      SPRING_PROFILES_ACTIVE: cloud
+      EUREKA_SERVER_URL: http://chat-eureka:8761/eureka/
+      PORT: 8585
+    depends_on:
+      - chat-postgres
+      - chat-config
+      - gateway
+    profiles:
+      - cloud
+

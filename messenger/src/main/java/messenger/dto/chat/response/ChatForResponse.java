@@ -12,7 +12,7 @@ import java.util.UUID;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Schema
+@Schema(description = "Чат")
 public class ChatForResponse {
 
     @Schema(description = "iD чата")

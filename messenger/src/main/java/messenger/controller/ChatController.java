@@ -8,6 +8,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import messenger.dto.chat.request.CreateChatRequest;
@@ -33,9 +36,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.async.DeferredResult;
 
+import java.util.List;
 import java.util.UUID;
 
 @Slf4j
@@ -157,7 +162,7 @@ public class ChatController {
         )
     })
     @PostMapping("/users")
-    public ResponseEntity<?> addUserChats(@RequestBody UsersChats usersChats) {
+    public ResponseEntity<?> addUserChats(@RequestBody UsersChatsRequest usersChats) {
         return ResponseEntity.status(HttpStatus.CREATED).body(chatService.addUserChats(usersChats));
     }
 
@@ -186,7 +191,7 @@ public class ChatController {
     })
     @GetMapping("/users")
     public ResponseEntity<?> getUsersChats(
-        @Param("request") String request,
+        @Parameter(name = "request") @RequestParam(required = false) String request,
         @Schema(hidden = true) @PageableDefault(size = 20) Pageable pageable
     ) {
         return ResponseEntity.status(HttpStatus.OK)
@@ -218,7 +223,7 @@ public class ChatController {
     @PostMapping("/{id}/send")
     public ResponseEntity<?> sendMessage(
         @PathVariable UUID id,
-        @Valid @RequestBody Message message
+        @Valid @RequestBody SendMessage message
     ) {
         UUID response = chatService.sendMessage(id, message);
         return ResponseEntity.status(HttpStatus.OK).body(response);
@@ -250,7 +255,7 @@ public class ChatController {
     @GetMapping("/{id}/messages")
     public ResponseEntity<?> getMessage(
         @PathVariable UUID id,
-        @Parameter(description = "поиск по слову") @Param("request") String request,
+        @Parameter(name = "request") @RequestParam(required = false) String request,
         @Schema(hidden = true) @PageableDefault(size = 20) Pageable pageable
     ) {
         return ResponseEntity.status(HttpStatus.OK)
@@ -283,5 +288,26 @@ public class ChatController {
     @GetMapping(value = "/subscribe/{chatId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public DeferredResult<MessageForResponse> subscribe(@Valid @PathVariable UUID chatId) {
         return chatService.subscribeOnChat(chatId);
+    }
+
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Schema(description = "Сообщение для отправки")
+    public static class SendMessage {
+        @Schema(description = "Текст")
+        private String text;
+        private List<String> photos;
+    }
+
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Schema(description = "добавление пользователя в чат")
+    public static class UsersChatsRequest {
+        @Schema(description = "Id пользователя")
+        private UUID userId;
+        @Schema(description = "Id чата")
+        private UUID chatId;
     }
 }

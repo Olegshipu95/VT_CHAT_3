@@ -11,6 +11,7 @@ import subscription.dto.subs.request.CreateSubRequest;
 import subscription.dto.subs.response.SubscriptionResponse;
 import subscription.entity.Subscribers;
 import subscription.exception.InternalException;
+import subscription.kafka.KafkaNotificationProducer;
 import subscription.repository.SubRepository;
 import subscription.utils.SecurityMock;
 
@@ -36,6 +37,9 @@ class SubscriptionServiceTest {
 
     @Mock
     private SubRepository subscribersRepository;
+
+    @Mock
+    private KafkaNotificationProducer kafkaNotificationProducer;
 
     @InjectMocks
     private SubscriptionService subscriptionService;

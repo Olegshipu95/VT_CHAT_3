@@ -11,6 +11,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.support.WebExchangeBindException;
+import org.springframework.web.reactive.resource.NoResourceFoundException;
 import org.springframework.web.server.ServerWebInputException;
 
 @Slf4j
@@ -29,6 +30,12 @@ public class RestControllerAdvice {
     public ResponseEntity<Error> internalException(InternalException ex) {
         log.error("Handle internal error", ex);
         return new Error(ex.getHttpStatus().value(), ex.getErrorCode())
+            .asResponseEntity();
+    }
+
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<Error> resourcesNotFoundExceptions(Exception exception) {
+        return new Error(HttpStatus.NOT_FOUND.value(), ErrorCode.RESOURCES_NOT_FOUND)
             .asResponseEntity();
     }
 
