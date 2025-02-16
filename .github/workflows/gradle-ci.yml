@@ -24,10 +24,10 @@ jobs:
       - name: Grant execute permission to gradlew
         run: |
           chmod +x ./config/gradlew
-          chmod +x ./eureka/gradlew 
+          chmod +x ./eureka/gradlew
+          chmod +x ./gateway/gradlew
           chmod +x ./feed/gradlew
           chmod +x ./file/gradlew
-          chmod +x ./gateway/gradlew
           chmod +x ./messenger/gradlew
           chmod +x ./notification/gradlew
           chmod +x ./subs/gradlew
