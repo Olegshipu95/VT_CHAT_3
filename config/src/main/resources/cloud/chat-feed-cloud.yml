@@ -1,0 +1,20 @@
+spring:
+  datasource:
+    url: ${FEED_DB_URL:jdbc:postgresql://localhost:5435/feed}
+    #url: ${FEED_DB_URL:jdbc:postgresql://chat-postgres:5432/feed}
+    username: ${POSTGRES_USER:username}
+    password: ${POSTGRES_PASSWORD:password}
+
+  liquibase:
+    enabled: true
+    url: ${FEED_DB_URL:jdbc:postgresql://localhost:5435/feed}
+    #url: ${FEED_DB_URL:jdbc:postgresql://chat-postgres:5432/feed}
+    user: ${POSTGRES_USER:username}
+    password: ${POSTGRES_PASSWORD:password}
+
+management:
+  endpoints:
+    web.exposure.include: "*"
+  endpoint:
+    health:
+      show-details: always

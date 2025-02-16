@@ -1,0 +1,23 @@
+spring:
+  mail:
+    host: smtp.yandex.ru
+    port: 465
+    username: oaoaoaoaoaoammmm@yandex.ru
+    password: wnjddfavfatwhpda
+    protocol: smtps
+    debug: true
+  kafka:
+    bootstrap-servers: localhost:29092, localhost:29093, localhost:29094
+    #bootstrap-servers: chat-kafka-broker-1:9092, chat-kafka-broker-2:9093, chat-kafka-broker-3:9094
+    consumer:
+      group-id: 1
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    topics:
+      notification-email-topic: chat-notification-email-topic
+management:
+  endpoints:
+    web.exposure.include: "*"
+  endpoint:
+    health:
+      show-details: always

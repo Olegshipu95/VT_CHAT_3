@@ -1,0 +1,25 @@
+databaseChangeLog:
+  - changeSet:
+      id: add-chat-table
+      author: VT-CHAT
+      changes:
+        - createTable:
+            tableName: chats
+            ifNotExists: true
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: name
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: chat_type
+                  type: bigint
+                  defaultValue: 0
+                  constraints:
+                    nullable: false

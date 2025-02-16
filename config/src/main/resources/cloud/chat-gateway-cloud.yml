@@ -1,0 +1,97 @@
+server:
+  api:
+    prefix: /api
+
+spring:
+  services:
+    urls:
+      user: chat-user-cloud
+      feed: chat-feed-cloud
+      subs: chat-subs-cloud
+      messenger: chat-messenger-cloud
+      file: chat-file-cloud
+
+springdoc:
+  swagger-ui:
+    enabled: true
+    config-url: /v3/api-docs/swagger-config
+    urls:
+      - url: /v3/api-docs
+        name: chat-gateway
+      - url: /api/v3/chat-user-cloud/v3/api-docs
+        name: chat-user-cloud
+      - url: /api/v3/chat-feed-cloud/v3/api-docs
+        name: chat-feed-cloud
+      - url: /api/v3/chat-subs-cloud/v3/api-docs
+        name: chat-subs-cloud
+      - url: /api/v3/chat-messenger-cloud/v3/api-docs
+        name: chat-messenger-cloud
+      - url: /api/v3/chat-file-cloud/v3/api-docs
+        name: chat-file-cloud
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      chat-user-cloud-circuit-breaker:
+        registerHealthIndicator: true
+        slidingWindowType: COUNT_BASED
+        slidingWindowSize: 10
+        minimumNumberOfCalls: 5
+        failureRateThreshold: 50
+        waitDurationInOpenState: 2s
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+        permittedNumberOfCallsInHalfOpenState: 5
+      chat-feed-cloud-circuit-breaker:
+        registerHealthIndicator: true
+        slidingWindowType: COUNT_BASED
+        slidingWindowSize: 10
+        minimumNumberOfCalls: 5
+        failureRateThreshold: 50
+        waitDurationInOpenState: 2s
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+        permittedNumberOfCallsInHalfOpenState: 5
+      chat-subs-cloud-circuit-breaker:
+        registerHealthIndicator: true
+        slidingWindowType: COUNT_BASED
+        slidingWindowSize: 10
+        minimumNumberOfCalls: 5
+        failureRateThreshold: 50
+        waitDurationInOpenState: 2s
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+        permittedNumberOfCallsInHalfOpenState: 5
+      chat-messenger-cloud-circuit-breaker:
+        registerHealthIndicator: true
+        slidingWindowType: COUNT_BASED
+        slidingWindowSize: 10
+        minimumNumberOfCalls: 5
+        failureRateThreshold: 50
+        waitDurationInOpenState: 2s
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+        permittedNumberOfCallsInHalfOpenState: 5
+      chat-file-cloud-circuit-breaker:
+        registerHealthIndicator: true
+        slidingWindowType: COUNT_BASED
+        slidingWindowSize: 10
+        minimumNumberOfCalls: 5
+        failureRateThreshold: 50
+        waitDurationInOpenState: 2s
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+        permittedNumberOfCallsInHalfOpenState: 5
+  timelimiter:
+    instances:
+      chat-messenger-cloud-circuit-breaker:
+        timeout-duration:
+          seconds: 65
+
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG
+    org.springframework.web: DEBUG
+    org.springframework.web.client.RestTemplate: DEBUG
+
+management:
+  endpoints:
+    web.exposure.include: "*"
+  endpoint:
+    health:
+      show-details: always

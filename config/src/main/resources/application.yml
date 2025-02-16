@@ -1,0 +1,18 @@
+spring:
+  application:
+    name: chat-config-cloud
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:native}
+  cloud:
+    config:
+      server:
+        native:
+          search-locations: classpath:/cloud
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_SERVER_URL:http://localhost:8761/eureka}
+
+server:
+  port: ${PORT:8888}

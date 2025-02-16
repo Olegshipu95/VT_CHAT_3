@@ -1,0 +1,18 @@
+spring:
+  application:
+    name: chat-eureka-cloud
+  #security:
+    #user:
+     # name: ${EUREKA_CLIENT_USERNAME:eureka_client}
+      #password: ${EUREKA_CLIENT_PASSWORD:eureka_password}
+
+eureka:
+  server:
+    metrics:
+      enabled: true
+  client:
+    fetch-registry: false
+    register-with-eureka: false
+
+server:
+  port: ${SERVER_PORT:8761}

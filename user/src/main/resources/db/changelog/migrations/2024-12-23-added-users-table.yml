@@ -1,0 +1,54 @@
+databaseChangeLog:
+  - changeSet:
+      id: add-user-table
+      author: VT-CHAT
+      changes:
+        - createTable:
+            tableName: users
+            ifNotExists: true
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  defaultValueComputed: gen_random_uuid()
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(100)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: surname
+                  type: varchar(100)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: email
+                  type: varchar(255)
+                  constraints:
+                    unique: true
+                    nullable: false
+              - column:
+                  name: password
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: brief_description
+                  type: text
+              - column:
+                  name: city
+                  type: varchar(100)
+              - column:
+                  name: birthday
+                  type: date
+              - column:
+                  name: logo_url
+                  type: varchar(255)
+              - column:
+                  name: role
+                  type: varchar(32)
+                  constraints:
+                    nullable: false

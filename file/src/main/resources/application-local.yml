@@ -1,0 +1,28 @@
+spring:
+  config:
+    activate:
+      on-profile: local
+  s3:
+    endpoint: ${MINIO_ENDPOINT:http://localhost:9000}
+    access-key: ${MINIO_ACCESS_KEY:username}
+    secret-key: ${MINIO_SECRET_KEY:password}
+    bucket: ${MINIO_BUCKET:chat}
+    region: ${MINIO_REGION:us-east-1}
+  cloud:
+    config:
+      enabled: false
+eureka:
+  client:
+    enabled: false
+management:
+  endpoints:
+    web.exposure.include: "*"
+  endpoint:
+    health:
+      show-details: always
+logging:
+  level:
+    org.springframework.web.socket: DEBUG
+    org.springframework.messaging.simp.stomp: DEBUG
+    org.springframework.web.socket.messaging: DEBUG
+    org.springframework.messaging: DEBUG

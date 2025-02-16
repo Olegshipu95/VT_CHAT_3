@@ -1,0 +1,15 @@
+info:
+  app:
+    name: Messenger
+    description: Messenger service
+  team:
+    name: D2 team
+
+spring:
+  application:
+    name: chat-messenger-cloud
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:local}
+
+server:
+  port: ${PORT:8086}

@@ -1,0 +1,26 @@
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5435/messenger}
+    username: ${POSTGRES_USER:username}
+    password: ${POSTGRES_PASSWORD:password}
+
+  liquibase:
+    url: ${DB_URL:jdbc:postgresql://localhost:5435/messenger}
+    user: ${POSTGRES_USER:username}
+    password: ${POSTGRES_PASSWORD:password}
+
+
+  cloud:
+    config:
+      enabled: false
+
+eureka:
+  client:
+    enabled: false
+
+management:
+  endpoints:
+    web.exposure.include: "*"
+  endpoint:
+    health:
+      show-details: always

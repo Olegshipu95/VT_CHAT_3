@@ -1,0 +1,30 @@
+databaseChangeLog:
+  - changeSet:
+      id: 7
+      author: VT-CHAT
+      changes:
+        - createTable:
+            tableName: subscribers
+            ifNotExists: true
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+              - column:
+                  name: subscribed_user_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+              - column:
+                  name: subscription_time
+                  type: timestamp
+                  constraints:
+                    nullable: false

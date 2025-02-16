@@ -1,0 +1,227 @@
+services:
+
+  chat-postgres:
+    container_name: chat-postgres-3
+    image: postgres:16
+    ports:
+      - "5435:5432"
+    environment:
+      POSTGRES_USER: username
+      POSTGRES_PASSWORD: password
+    volumes:
+      - ./init_databases.sql:/docker-entrypoint-initdb.d/init_databases.sql
+    profiles:
+      - cloud
+      - local
+
+  chat-minio:
+    container_name: chat-minio
+    image: bitnami/minio:2024
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: username
+      MINIO_ROOT_PASSWORD: password
+      MINIO_DEFAULT_BUCKETS: chat
+    profiles:
+      - cloud
+      - local
+
+  chat-zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    container_name: chat-zookeeper
+    environment:
+      ZOOKEEPER_SERVER_ID: 1
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "22181:2181"
+    profiles:
+      - cloud
+      - local
+
+  chat-kafka-broker-1:
+    image: confluentinc/cp-kafka:latest
+    container_name: chat-kafka-broker-1
+    ports:
+      - "9092:9092"
+      - "29092:29092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: chat-zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://chat-kafka-broker-1:9092, PLAINTEXT_HOST://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT, PLAINTEXT_HOST:PLAINTEXT
+    depends_on:
+      - chat-zookeeper
+    profiles:
+      - cloud
+      - local
+
+  chat-kafka-broker-2:
+    image: confluentinc/cp-kafka:latest
+    container_name: chat-kafka-broker-2
+    ports:
+      - "9093:9093"
+      - "29093:29093"
+    environment:
+      KAFKA_BROKER_ID: 2
+      KAFKA_ZOOKEEPER_CONNECT: chat-zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://chat-kafka-broker-2:9093, PLAINTEXT_HOST://localhost:29093
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT, PLAINTEXT_HOST:PLAINTEXT
+    depends_on:
+      - chat-zookeeper
+    profiles:
+      - cloud
+      - local
+
+  chat-kafka-broker-3:
+    image: confluentinc/cp-kafka:latest
+    container_name: chat-kafka-broker-3
+    ports:
+      - "9094:9094"
+      - "29094:29094"
+    depends_on:
+      - chat-zookeeper
+    environment:
+      KAFKA_BROKER_ID: 3
+      KAFKA_ZOOKEEPER_CONNECT: chat-zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://chat-kafka-broker-3:9094, PLAINTEXT_HOST://localhost:29094
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT, PLAINTEXT_HOST:PLAINTEXT
+    profiles:
+      - cloud
+      - local
+
+  chat-eureka:
+    container_name: eureka-3
+    image: eureka
+    ports:
+      - "8761:8761"
+    build:
+      context: eureka
+      dockerfile: Dockerfile
+    environment:
+      PORT: 8761
+    profiles:
+      - cloud
+
+  chat-config:
+    container_name: config-3
+    image: config
+    ports:
+      - "8888:8888"
+    build:
+      context: config
+      dockerfile: Dockerfile
+    environment:
+      SPRING_PROFILES_ACTIVE: native
+      EUREKA_SERVER_URL: http://chat-eureka:8761/eureka/
+      PORT: 8888
+      POSTGRES_USER: username
+      POSTGRES_PASSWORD: password
+      FEED_DB_URL: jdbc:postgresql://chat-postgres:5432/feed
+      SUBS_DB_URL: jdbc:postgresql://chat-postgres:5432/subs
+      MESSENGER_DB_URL: jdbc:postgresql://chat-postgres:5432/messenger
+      USER_R2DBC_URL: r2dbc:postgresql://chat-postgres:5432/users
+      USER_DB_URL: jdbc:postgresql://chat-postgres:5432/users
+    profiles:
+      - cloud
+
+  gateway:
+    container_name: gateway-3
+    image: gateway
+    ports:
+      - "8080:8080"
+    build:
+      context: gateway
+      dockerfile: Dockerfile
+    environment:
+      SPRING_PROFILES_ACTIVE: cloud
+      EUREKA_SERVER_URL: http://chat-eureka:8761/eureka/
+      API_PREFIX: /api
+      PORT: 8080
+    depends_on:
+      - chat-eureka
+      - chat-config
+    profiles:
+      - cloud
+
+  user:
+    container_name: user-3
+    restart: always
+    image: user
+    ports:
+      - "8383:8383"
+    build:
+      context: user
+      dockerfile: Dockerfile
+    environment:
+      SPRING_PROFILES_ACTIVE: cloud
+      EUREKA_SERVER_URL: http://chat-eureka:8761/eureka/
+      PORT: 8383
+    depends_on:
+      - chat-postgres
+      - chat-config
+      - gateway
+    profiles:
+      - cloud
+
+  feed:
+    container_name: feed-3
+    restart: always
+    image: feed
+    ports:
+      - "8381:8381"
+    build:
+      context: feed
+      dockerfile: Dockerfile
+    environment:
+      SPRING_PROFILES_ACTIVE: cloud
+      EUREKA_SERVER_URL: http://chat-eureka:8761/eureka/
+      PORT: 8381
+    depends_on:
+      - chat-postgres
+      - chat-config
+      - gateway
+    profiles:
+      - cloud
+
+  subscription:
+    container_name: subscription-3
+    image: subscription
+    restart: always
+    ports:
+      - "8084:8084"
+    build:
+      context: subs
+      dockerfile: Dockerfile
+    environment:
+      SPRING_PROFILES_ACTIVE: cloud
+      EUREKA_SERVER_URL: http://chat-eureka:8761/eureka/
+      PORT: 8084
+    depends_on:
+      - chat-postgres
+      - chat-config
+      - gateway
+    profiles:
+      - cloud
+
+  chat-messenger:
+    container_name: messenger-3
+    image: messenger
+    restart: always
+    ports:
+      - "8382:8382"
+    build:
+      context: messenger
+      dockerfile: Dockerfile
+    environment:
+      SPRING_PROFILES_ACTIVE: cloud
+      EUREKA_SERVER_URL: http://chat-eureka:8761/eureka/
+      PORT: 8382
+    depends_on:
+      - chat-postgres
+      - chat-config
+      - gateway
+    profiles:
+      - cloud
