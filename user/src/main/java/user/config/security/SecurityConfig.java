@@ -29,15 +29,12 @@ public class SecurityConfig {
             .formLogin(ServerHttpSecurity.FormLoginSpec::disable)
             .httpBasic(ServerHttpSecurity.HttpBasicSpec::disable)
             .anonymous(ServerHttpSecurity.AnonymousSpec::disable)
-            //.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeExchange(exchange -> {
                 exchange.pathMatchers(
                     "/actuator/**",
                     "/webjars/**",
-                    "/swagger-ui/**",
                     "chat-user-cloud/v3/api-docs/**",
-                    "/auth/tokens/**",
-                    "/accounts/users/**"
+                    "/auth/tokens/**"
                 ).permitAll();
                 exchange.pathMatchers("/**").authenticated();
             })
