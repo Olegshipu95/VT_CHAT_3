@@ -79,9 +79,22 @@ resilience4j:
         permittedNumberOfCallsInHalfOpenState: 5
   timelimiter:
     instances:
+      chat-user-cloud-circuit-breaker:
+        timeout-duration:
+          seconds: 5
+      chat-feed-cloud-circuit-breaker:
+        timeout-duration:
+          seconds: 5
+      chat-subs-cloud-circuit-breaker:
+        timeout-duration:
+          seconds: 5
       chat-messenger-cloud-circuit-breaker:
         timeout-duration:
           seconds: 65
+      chat-file-cloud-circuit-breaker:
+        timeout-duration:
+          seconds: 5
+
 
 logging:
   level:
